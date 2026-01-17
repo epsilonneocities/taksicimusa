@@ -8,10 +8,11 @@ body {
   background:#0d0d0d;
   color:#e0e0e0;
   font-family: monospace;
+  text-align:center;
 }
 .container {
   max-width:600px;
-  margin:100px auto;
+  margin:80px auto;
   border:1px solid #333;
   padding:30px;
 }
@@ -23,59 +24,144 @@ input, button {
   font-family: monospace;
 }
 button { cursor:pointer; }
-#msg { margin-top:10px; }
+.grid {
+  display:grid;
+  grid-template-columns: repeat(5, 60px);
+  gap:6px;
+  justify-content:center;
+  margin:20px 0;
+}
+.cell {
+  width:60px;
+  height:60px;
+  background:#111;
+  border:1px solid #333;
+  cursor:pointer;
+}
+.cell.on { background:#e0e0e0; }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h2>Seviye <span id="lvl"></span></h2>
-  <p id="text"></p>
-  <input id="answer" autocomplete="off">
-  <button onclick="submitAnswer()">Gönder</button>
-  <div id="msg"></div>
-</div>
+<div class="container" id="game"></div>
 
 <script>
-const puzzles = [
-  "5x5 bir grid düşün. Köşeler açıksa merkez kaç toggleda kapanır?",
-  "Bir sayı var: 2, 6, 12, 20, 30, ?",
-  "ERBERK isminin harf sayısı kadar asal sayıdan oluşan dizide 4. terim?",
-  "10101 ikilik sayısı kaçtır?",
-  "Bir Lights Out çözümünde mod 2 lineer bağımlılık varsa determinant kaç olur?",
-  "Bir matrisin rankı 3 ise nullity kaçtır? (Boyut 5)",
-  "Bu seviyeyi geçmek için yapman gereken şey adam gibi düşünmek."
-];
-
-// SHA-256 hashleri (cevaplar açıkta değil)
-const hashes = [
-  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", 
-  "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049",
-  "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
-  "4a44dc15364204a80fe80e9039455cc1608281820fe2b24fbe7e6c6f04a4b6aa",
-  "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
-  "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
-  "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
-  "b83c3c97b35e9b504e3b6763c8f3c71d23c6fef6e97361b1f7d53e3a6eae56ef" // ERBERK
-];
-
 let level = parseInt(localStorage.getItem("level") || "0");
 
-function update() {
-  document.getElementById("lvl").innerText = level + 1;
-  if(level < puzzles.length) {
-    document.getElementById("text").innerText = puzzles[level];
-  } else {
-    document.body.innerHTML = "<h1 style='text-align:center;margin-top:200px'>ERBERK</h1>";
+const textLevels = [
+  { q: "01000101 (binary) → ?", a: "e" },
+  { q: "ASCII: 82", a: "r" },
+  { q: "01000010", a: "b" },
+  { q: "Mirror of E", a: "e" },
+  { q: "Alphabet position of 18", a: "r" },
+  { q: "Hex: 4b", a: "k" },
+  { q: "Bir kelime: E R B E R K", a: "erberk" }
+];
+
+// --- LIGHTS OUT FINAL ---
+const size = 5;
+let state = [];
+let initial = [];
+
+function render() {
+  const game = document.getElementById("game");
+  game.innerHTML = "";
+
+  if(level < 7) {
+    const l = textLevels[level];
+    game.innerHTML = `
+      <h2>Seviye ${level+1}</h2>
+      <p>${l.q}</p>
+      <input id="ans">
+      <button onclick="checkText()">Gönder</button>
+      <div id="msg"></div>
+    `;
+  }
+  else if(level === 7) {
+    game.innerHTML = `
+      <h2>Seviye 8</h2>
+      <p>Tüm ışıkları kapat.</p>
+      <div class="grid" id="grid"></div>
+      <button onclick="reset()">Sıfırla</button>
+      <div id="msg"></div>
+    `;
+    generate();
+    draw();
+  }
+  else {
+    document.body.innerHTML =
+      "<h1 style='margin-top:200px'>ERBERK</h1>";
   }
 }
 
-async function sha256(text) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(buf)).map(x => x.toString(16).padStart(2,"0")).join("");
+// -------- TEXT LEVELS ----------
+function checkText() {
+  const input = document.getElementById("ans").value.trim().toLowerCase();
+  if(input === textLevels[level].a) {
+    level++;
+    localStorage.setItem("level", level);
+    render();
+  } else {
+    document.getElementById("msg").innerText = "Yanlış.";
+  }
 }
 
-async function submitAnswer() {
+// -------- LIGHTS OUT ----------
+function idx(x,y){return y*size+x;}
+
+function toggle(i){
+  if(i<0||i>=25)return;
+  state[i]=state[i]?0:1;
+}
+
+function move(i){
+  const x=i%5, y=Math.floor(i/5);
+  toggle(i);
+  if(y>0) toggle(idx(x,y-1));
+  if(y<4) toggle(idx(x,y+1));
+  if(x>0) toggle(idx(x-1,y));
+  if(x<4) toggle(idx(x+1,y));
+}
+
+function clickCell(i){
+  move(i);
+  draw();
+  if(state.every(v=>v===0)){
+    level++;
+    localStorage.setItem("level", level);
+    render();
+  }
+}
+
+function draw(){
+  const grid=document.getElementById("grid");
+  grid.innerHTML="";
+  state.forEach((v,i)=>{
+    const d=document.createElement("div");
+    d.className="cell"+(v?" on":"");
+    d.onclick=()=>clickCell(i);
+    grid.appendChild(d);
+  });
+}
+
+function generate(){
+  state=new Array(25).fill(0);
+  for(let i=0;i<20;i++){
+    move(Math.floor(Math.random()*25));
+  }
+  initial=[...state];
+}
+
+function reset(){
+  state=[...initial];
+  draw();
+}
+
+render();
+</script>
+
+</body>
+</html>
   const val = document.getElementById("answer").value.trim();
   const hash = await sha256(val);
   if(hash === hashes[level]) {
