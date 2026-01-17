@@ -1,175 +1,125 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Puzzle</title>
+<title>Seviye 1</title>
 <style>
-body {
-  background:#0d0d0d;
-  color:#e0e0e0;
-  font-family: monospace;
-  text-align:center;
+body { 
+  background:#0b0b0b; 
+  color:#00ff9c; 
+  font-family:monospace; 
+  text-align:center; 
+  padding-top:50px; 
 }
-.container {
-  max-width:600px;
-  margin:80px auto;
-  border:1px solid #333;
-  padding:30px;
+input,button { 
+  background:black; 
+  color:#00ff9c; 
+  border:1px solid #00ff9c; 
+  padding:8px; 
+  margin-top:10px;
 }
-input, button {
-  background:black;
-  color:#e0e0e0;
-  border:1px solid #333;
-  padding:8px;
-  font-family: monospace;
-}
-button { cursor:pointer; }
-.grid {
-  display:grid;
-  grid-template-columns: repeat(5, 60px);
-  gap:6px;
-  justify-content:center;
-  margin:20px 0;
-}
-.cell {
-  width:60px;
-  height:60px;
-  background:#111;
-  border:1px solid #333;
-  cursor:pointer;
-}
-.cell.on { background:#e0e0e0; }
+.hidden { color:black; }
 </style>
 </head>
 <body>
 
-<div class="container" id="game"></div>
+<h1 id="level">SEVİYE 1</h1>
+<p id="text">Kaynak koduna bakmayı denedin mi?</p>
+
+<!-- level2 = bW9yc2U= -->
+
+<input id="code" placeholder="Kod gir">
+<br>
+<button onclick="check()">Gönder</button>
 
 <script>
-let level = parseInt(localStorage.getItem("level") || "0");
+let level = localStorage.getItem("level") || 1;
+level = parseInt(level);
 
-/* ZORLUK GİTTİKÇE ARTAN SEVİYELER */
-const textLevels = [
-  { q: "3 + 5 × 2 = ?", a: "13" },
+document.getElementById("level").innerText = "SEVİYE " + level;
 
-  { q: "1011 (binary) → decimal?", a: "11" },
+const answers = {
+  1: "MORSE",
+  2: "KAYNAK",
+  3: "KONSOL",
+  4: "LOCAL",
+  5: "PARAMETRE",
+  6: "BASE64",
+  7: "BIRLESTIR",
+  8: "ERBERK"
+};
 
-  { q: "72 69 76 76 79", a: "hello" },
-
-  { q: "A1  B2  C3  D?", a: "4" },
-
-  { q: "KHOOR → ?", a: "hello" },
-
-  { q: "2 6 12 20 30 ?", a: "42" },
-
-  { q: "Bir kelime: sayı + renk + yön (İngilizce)", a: "onebluesouth" }
-];
-
-const size = 5;
-let state = [];
-let initial = [];
-
-function render() {
-  const game = document.getElementById("game");
-  game.innerHTML = "";
-
-  if(level < 7) {
-    const l = textLevels[level];
-    game.innerHTML = `
-      <h2>Seviye ${level+1}</h2>
-      <p>${l.q}</p>
-      <input id="ans">
-      <button onclick="checkText()">Gönder</button>
-      <div id="msg"></div>
-    `;
-  }
-  else if(level === 7) {
-    game.innerHTML = `
-      <h2>Seviye 8</h2>
-      <p>Tüm ışıkları kapat.</p>
-      <div class="grid" id="grid"></div>
-      <button onclick="reset()">Sıfırla</button>
-      <div id="msg"></div>
-    `;
-    generate();
-    draw();
-  }
-  else {
-  document.body.innerHTML = `
-    <div style="margin-top:200px; text-align:center; font-family:monospace;">
-      <h1>TEBRİKLER</h1>
-      <p>Puzzle tamamlandı.</p>
-      <button onclick="restart()">Baştan Başla</button>
-    </div>
-  `;
-  }
-    
-  }
-}
-
-function checkText() {
-  const input = document.getElementById("ans").value.trim().toLowerCase();
-  if(input === textLevels[level].a) {
+function check(){
+  let val = document.getElementById("code").value.toUpperCase().trim();
+  if(val === answers[level]){
     level++;
     localStorage.setItem("level", level);
-    render();
+    document.getElementById("code").value = "";
+    next();
   } else {
-    document.getElementById("msg").innerText = "Yanlış.";
+    alert("Yanlış.");
   }
 }
 
-function idx(x,y){return y*size+x;}
+function next(){
+  document.title = "Seviye " + level;
+  document.getElementById("level").innerText = "SEVİYE " + level;
 
-function toggle(i){
-  if(i<0||i>=25)return;
-  state[i]=state[i]?0:1;
-}
+  if(level == 1){
+    document.getElementById("text").innerText = "Kaynak koduna bakmayı denedin mi?";
+  }
 
-function move(i){
-  const x=i%5, y=Math.floor(i/5);
-  toggle(i);
-  if(y>0) toggle(idx(x,y-1));
-  if(y<4) toggle(idx(x,y+1));
-  if(x>0) toggle(idx(x-1,y));
-  if(x<4) toggle(idx(x+1,y));
-}
+  if(level == 2){
+    document.getElementById("text").innerText = "... --- ... .";
+  }
 
-function clickCell(i){
-  move(i);
-  draw();
-  if(state.every(v=>v===0)){
-    level++;
-    localStorage.setItem("level", level);
-    render();
+  if(level == 3){
+    document.getElementById("text").innerText = "Cevap konsolda gizli.";
+    console.log("Cevap: KONSOL");
+  }
+
+  if(level == 4){
+    document.getElementById("text").innerText = "Tarayıcının hafızasını araştır.";
+  }
+
+  if(level == 5){
+    document.getElementById("text").innerText = "URL seni yönlendirir.";
+    history.pushState({}, "", "?anahtar=PARAMETRE");
+  }
+
+  if(level == 6){
+    document.getElementById("text").innerText = "QkFTRTY0";
+  }
+
+  if(level == 7){
+    document.getElementById("text").innerHTML = `
+      <span class="hidden">ER</span>
+      <span> </span>
+      <span class="hidden">BERK</span>
+      Parçaları birleştir.
+    `;
+  }
+
+  if(level == 8){
+    document.getElementById("text").innerText = "Son adım.";
+  }
+
+  if(level == 9){
+    document.body.innerHTML = `
+      <h1>KAZANDIN</h1>
+      <p>ERBERK bulundu.</p>
+      <button onclick="restart()">Baştan Başla</button>
+    `;
   }
 }
 
-function draw(){
-  const grid=document.getElementById("grid");
-  grid.innerHTML="";
-  state.forEach((v,i)=>{
-    const d=document.createElement("div");
-    d.className="cell"+(v?" on":"");
-    d.onclick=()=>clickCell(i);
-    grid.appendChild(d);
-  });
+function restart(){
+  localStorage.setItem("level", "1");
+  location.reload();
 }
 
-function generate(){
-  state=new Array(25).fill(0);
-  for(let i=0;i<20;i++){
-    move(Math.floor(Math.random()*25));
-  }
-  initial=[...state];
-}
-
-function reset(){
-  state=[...initial];
-  draw();
-}
-
-render();
+next();
 </script>
 
 </body>
-</html>   
+</html>
