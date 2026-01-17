@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -48,14 +48,21 @@ button { cursor:pointer; }
 <script>
 let level = parseInt(localStorage.getItem("level") || "0");
 
+/* ZORLUK GİTTİKÇE ARTAN SEVİYELER */
 const textLevels = [
-  { q: "01000101 (binary) → ?", a: "e" },
-  { q: "ASCII: 82", a: "r" },
-  { q: "01000010", a: "b" },
-  { q: "Mirror of E", a: "e" },
-  { q: "Alphabet position of 18", a: "r" },
-  { q: "Hex: 4b", a: "k" },
-  { q: "Bir kelime: E R B E R K", a: "erberk" }
+  { q: "3 + 5 × 2 = ?", a: "13" },
+
+  { q: "1011 (binary) → decimal?", a: "11" },
+
+  { q: "72 69 76 76 79", a: "hello" },
+
+  { q: "A1  B2  C3  D?", a: "4" },
+
+  { q: "KHOOR → ?", a: "hello" },
+
+  { q: "2 6 12 20 30 ?", a: "42" },
+
+  { q: "Bir kelime: sayı + renk + yön (İngilizce)", a: "onebluesouth" }
 ];
 
 const size = 5;
@@ -89,7 +96,7 @@ function render() {
   }
   else {
     document.body.innerHTML =
-      "<h1 style='margin-top:200px'>ERBERK</h1>";
+      "<h1 style='margin-top:200px'>TEBRİKLER</h1>";
   }
 }
 
@@ -158,4 +165,4 @@ render();
 </script>
 
 </body>
-</html>
+</html>   
