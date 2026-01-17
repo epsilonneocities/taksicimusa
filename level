@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Seviye 1</title>
+<style>
+body { background:#0b0b0b; color:#00ff9c; font-family:monospace; text-align:center; padding-top:50px; }
+input,button { background:black; color:#00ff9c; border:1px solid #00ff9c; padding:8px; }
+.hidden { color:black; }
+</style>
+</head>
+<body>
+
+<h1 id="level">SEVİYE 1</h1>
+<p id="text">Kaynak koduna bakmayı denedin mi?</p>
+
+<!-- level2 = bW9yc2U= -->
+
+<input id="code" placeholder="Kod gir">
+<button onclick="check()">Gönder</button>
+
+<script>
+let level = localStorage.getItem("level") || 1;
+document.getElementById("level").innerText = "SEVİYE " + level;
+
+const answers = {
+1: "MORSE",
+2: "KAYNAK",
+3: "KONSOL",
+4: "LOCAL",
+5: "PARAMETRE",
+6: "BASE64",
+7: "BIRLESTIR",
+8: "ERBERK"
+};
+
+function check(){
+  let val = document.getElementById("code").value.toUpperCase();
+  if(val === answers[level]){
+    level++;
+    localStorage.setItem("level", level);
+    next();
+  } else alert("Yanlış.");
+}
+
+function next(){
+  document.title = "Seviye " + level;
+  document.getElementById("level").innerText = "SEVİYE " + level;
+
+  if(level == 2){
+    document.getElementById("text").innerText = "... --- ... .";
+  }
+
+  if(level == 3){
+    document.getElementById("text").innerText = "Cevap konsolda gizli.";
+    console.log("Cevap: KONSOL");
+  }
+
+  if(level == 4){
+    document.getElementById("text").innerHTML = "Tarayıcının hafızasını araştır.";
+  }
+
+  if(level == 5){
+    document.getElementById("text").innerHTML = "URL seni yönlendirir.";
+    history.pushState({}, "", "?anahtar=PARAMETRE");
+  }
+
+  if(level == 6){
+    document.getElementById("text").innerHTML = "QkFTRTY0";
+  }
+
+  if(level == 7){
+    document.getElementById("text").innerHTML = `
+      <span class="hidden">ER</span>
+      <span> </span>
+      <span class="hidden">BERK</span>
+      Parçaları birleştir.
+    `;
+  }
+
+  if(level == 8){
+    document.body.innerHTML = "<h1>KAZANDIN</h1><p>ERBERK bulundu.</p>";
+  }
+}
+
+next();
+</script>
+</body>
+</html>
