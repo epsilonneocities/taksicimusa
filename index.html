@@ -2,86 +2,94 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>ERBERK Puzzle</title>
+<title>Puzzle</title>
 <style>
-  body {
-    background: #0f0f0f;
-    color: #e0e0e0;
-    font-family: monospace;
-    text-align: center;
-    padding-top: 60px;
-  }
-  .box {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    width: 300px;
-    margin: auto;
-    padding: 20px;
-  }
-  input {
-    background: black;
-    color: #0f0;
-    border: 1px solid #333;
-    padding: 6px;
-    width: 200px;
-  }
-  button {
-    background: #111;
-    color: #ccc;
-    border: 1px solid #444;
-    padding: 6px 12px;
-    margin-top: 10px;
-    cursor: pointer;
-  }
+body {
+  background:#0d0d0d;
+  color:#e0e0e0;
+  font-family: monospace;
+}
+.container {
+  max-width:600px;
+  margin:100px auto;
+  border:1px solid #333;
+  padding:30px;
+}
+input, button {
+  background:black;
+  color:#e0e0e0;
+  border:1px solid #333;
+  padding:8px;
+  font-family: monospace;
+}
+button { cursor:pointer; }
+#msg { margin-top:10px; }
 </style>
 </head>
 <body>
 
-<div class="box">
-  <h2>Seviye <span id="level">1</span></h2>
-  <p id="question">Kod gir:</p>
+<div class="container">
+  <h2>Seviye <span id="lvl"></span></h2>
+  <p id="text"></p>
   <input id="answer" autocomplete="off">
-  <br>
-  <button onclick="check()">Onayla</button>
-  <p id="result"></p>
+  <button onclick="submitAnswer()">Gönder</button>
+  <div id="msg"></div>
 </div>
 
 <script>
-console.log("burada değil.");
-
-const levels = [
-  "anahtar",
-  "duzen",
-  "yansima",
-  "sekil",
-  "oruntu",
-  "ters",
-  "harf",
-  "erberk"
+const puzzles = [
+  "5x5 bir grid düşün. Köşeler açıksa merkez kaç toggleda kapanır?",
+  "Bir sayı var: 2, 6, 12, 20, 30, ?",
+  "ERBERK isminin harf sayısı kadar asal sayıdan oluşan dizide 4. terim?",
+  "10101 ikilik sayısı kaçtır?",
+  "Bir Lights Out çözümünde mod 2 lineer bağımlılık varsa determinant kaç olur?",
+  "Bir matrisin rankı 3 ise nullity kaçtır? (Boyut 5)",
+  "Bu seviyeyi geçmek için yapman gereken şey adam gibi düşünmek."
 ];
 
-let current = 0;
+// SHA-256 hashleri (cevaplar açıkta değil)
+const hashes = [
+  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", 
+  "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049",
+  "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+  "4a44dc15364204a80fe80e9039455cc1608281820fe2b24fbe7e6c6f04a4b6aa",
+  "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+  "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+  "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+  "b83c3c97b35e9b504e3b6763c8f3c71d23c6fef6e97361b1f7d53e3a6eae56ef" // ERBERK
+];
 
-document.getElementById("question").innerText =
-  "Bu sistem düşündüğünden daha basit.";
+let level = parseInt(localStorage.getItem("level") || "0");
 
-function check() {
-  const input = document.getElementById("answer").value.toLowerCase().trim();
-
-  if (input === levels[current]) {
-    current++;
-    if (current === levels.length) {
-      document.body.innerHTML = "<h1>Tamamlandı</h1><p>ERBERK</p>";
-    } else {
-      document.getElementById("level").innerText = current + 1;
-      document.getElementById("result").innerText = "Doğru.";
-      document.getElementById("answer").value = "";
-      console.log("Bir adım daha ileridesin.");
-    }
+function update() {
+  document.getElementById("lvl").innerText = level + 1;
+  if(level < puzzles.length) {
+    document.getElementById("text").innerText = puzzles[level];
   } else {
-    document.getElementById("result").innerText = "Yanlış.";
+    document.body.innerHTML = "<h1 style='text-align:center;margin-top:200px'>ERBERK</h1>";
   }
 }
+
+async function sha256(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(x => x.toString(16).padStart(2,"0")).join("");
+}
+
+async function submitAnswer() {
+  const val = document.getElementById("answer").value.trim();
+  const hash = await sha256(val);
+  if(hash === hashes[level]) {
+    level++;
+    localStorage.setItem("level", level);
+    document.getElementById("msg").innerText = "Doğru.";
+    document.getElementById("answer").value = "";
+    update();
+  } else {
+    document.getElementById("msg").innerText = "Yanlış.";
+  }
+}
+
+update();
 </script>
 
 </body>
