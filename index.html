@@ -1,11 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>ERBERK Puzzle</title>
+<meta charset="UTF-8">
+<title>ERBERK Puzzle</title>
+<style>
+  body {
+    background: #0f0f0f;
+    color: #e0e0e0;
+    font-family: monospace;
+    text-align: center;
+    padding-top: 60px;
+  }
+  .box {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    width: 300px;
+    margin: auto;
+    padding: 20px;
+  }
+  input {
+    background: black;
+    color: #0f0;
+    border: 1px solid #333;
+    padding: 6px;
+    width: 200px;
+  }
+  button {
+    background: #111;
+    color: #ccc;
+    border: 1px solid #444;
+    padding: 6px 12px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
-  <h1>Site çalışıyor 🎉</h1>
-  <p>Yakında puzzle başlıyor...</p>
+
+<div class="box">
+  <h2>Seviye <span id="level">1</span></h2>
+  <p id="question">Kod gir:</p>
+  <input id="answer" autocomplete="off">
+  <br>
+  <button onclick="check()">Onayla</button>
+  <p id="result"></p>
+</div>
+
+<script>
+console.log("burada değil.");
+
+const levels = [
+  "anahtar",
+  "duzen",
+  "yansima",
+  "sekil",
+  "oruntu",
+  "ters",
+  "harf",
+  "erberk"
+];
+
+let current = 0;
+
+document.getElementById("question").innerText =
+  "Bu sistem düşündüğünden daha basit.";
+
+function check() {
+  const input = document.getElementById("answer").value.toLowerCase().trim();
+
+  if (input === levels[current]) {
+    current++;
+    if (current === levels.length) {
+      document.body.innerHTML = "<h1>Tamamlandı</h1><p>ERBERK</p>";
+    } else {
+      document.getElementById("level").innerText = current + 1;
+      document.getElementById("result").innerText = "Doğru.";
+      document.getElementById("answer").value = "";
+      console.log("Bir adım daha ileridesin.");
+    }
+  } else {
+    document.getElementById("result").innerText = "Yanlış.";
+  }
+}
+</script>
+
 </body>
 </html>
