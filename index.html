@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -58,7 +58,6 @@ const textLevels = [
   { q: "Bir kelime: E R B E R K", a: "erberk" }
 ];
 
-// --- LIGHTS OUT FINAL ---
 const size = 5;
 let state = [];
 let initial = [];
@@ -94,7 +93,6 @@ function render() {
   }
 }
 
-// -------- TEXT LEVELS ----------
 function checkText() {
   const input = document.getElementById("ans").value.trim().toLowerCase();
   if(input === textLevels[level].a) {
@@ -106,7 +104,6 @@ function checkText() {
   }
 }
 
-// -------- LIGHTS OUT ----------
 function idx(x,y){return y*size+x;}
 
 function toggle(i){
@@ -158,24 +155,6 @@ function reset(){
 }
 
 render();
-</script>
-
-</body>
-</html>
-  const val = document.getElementById("answer").value.trim();
-  const hash = await sha256(val);
-  if(hash === hashes[level]) {
-    level++;
-    localStorage.setItem("level", level);
-    document.getElementById("msg").innerText = "Doğru.";
-    document.getElementById("answer").value = "";
-    update();
-  } else {
-    document.getElementById("msg").innerText = "Yanlış.";
-  }
-}
-
-update();
 </script>
 
 </body>
